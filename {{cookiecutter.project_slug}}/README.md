@@ -20,6 +20,7 @@ A clean, flexible research project template generated from **cookiecutter-resear
 - `pipelines/` — Optional workflow definitions (Snakemake, YAML, etc.)
 - `notebooks/` — Jupyter notebooks for exploration or papers
 - `figures/` — Output figures and plots
+- `tables/` — Output tables
 - `env/` — Environment setup (requirements, virtualenv)
 
 ---
@@ -58,8 +59,3 @@ This writes a small artifact to `data/products/example_artifact.txt`.
 - Version control: track only code and configuration; avoid committing large data files.
 
 ---
-
-## Credits
-
-Created by **Jonathan D. Henshaw**
-Generated from [cookiecutter-research-project](https://github.com/jdhenshaw/cookiecutter-research-project)

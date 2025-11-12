@@ -1,65 +1,80 @@
-# {{ cookiecutter.project_name }}
+# Cookiecutter Research Project Template
 
-A clean, flexible research project template generated from **cookiecutter-research-project**.
+A clean, flexible **Cookiecutter template** for reproducible research projects.
 
-> {{ cookiecutter.description }}
-
----
-
-## Structure
-
-- `config/` — Configuration files (paths, parameters, settings)
-- `data/` — Data directories:
-  - `core/` — Raw or base data
-  - `products/` — Processed, publishable outputs
-  - `scratch/` — Temporary or intermediate data
-- `src/` — Source code for reusable modules:
-  - `core/` — I/O and configuration utilities
-  - `tasks/` — Reproducible analysis tasks
-  - `plotting/` — Figure and visualization scripts
-- `pipelines/` — Optional workflow definitions (Snakemake, YAML, etc.)
-- `notebooks/` — Jupyter notebooks for exploration or papers
-- `figures/` — Output figures and plots
-- `env/` — Environment setup (requirements, virtualenv)
+> Designed to organize data, code, notebooks, and figures in a consistent way.
 
 ---
 
-## Setup
+## What It Does
+
+This template helps you:
+
+- Keep research projects modular and reproducible.
+- Separate raw data, processed outputs, and figures cleanly.
+- Standardize your project structure for future work.
+
+---
+
+## Folder Structure
+
+The generated project looks like this:
+
+```
+my-research-project/
+├── config/          # configuration files (paths, parameters)
+├── data/
+│   ├── core/        # raw or base data
+│   ├── products/    # processed, publishable outputs
+│   └── scratch/     # temporary or intermediate files
+├── src/
+│   ├── core/        # reusable code (I/O, config loading)
+│   ├── tasks/       # analysis routines
+│   └── plotting/    # visualization utilities
+├── notebooks/       # Jupyter notebooks
+├── figures/         # output figures
+├── tables/          # output tables
+├── env/             # environment setup (requirements, virtualenv)
+└── README.md
+```
+
+---
+
+## How to Use
 
 ```bash
-# create and activate virtual environment
+pip install cookiecutter
+cookiecutter gh:jdhenshaw/cookiecutter-research-project
+```
+
+Then follow the prompts to name your new project and set up your environment.
+
+---
+
+## Quickstart (inside a generated project)
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
-
-# install dependencies
 pip install -r env/requirements.txt
 pip install -e .
+python -c "from my_research_project.tasks import run_task; print(run_task('template'))"
 ```
 
 ---
 
-## Quickstart
+## Notes
 
-You can run a registered task immediately:
-
-```bash
-python -c "from {{ cookiecutter.package_name }}.tasks import run_task; print(run_task('template'))"
-```
-
-This writes a small artifact to `data/products/example_artifact.txt`.
-
----
-
-## Tips
-
-- All data paths and analysis parameters are defined in `config/paths.yaml` and `config/params.yaml`.
-- You can create new tasks by adding a file to `src/{{ cookiecutter.package_name }}/tasks/` with a top-level `run()` function.
-- The task registry auto-discovers new tasks — no manual imports needed.
-- Version control: track only code and configuration; avoid committing large data files.
+- Configuration lives in `config/paths.yaml` and `config/params.yaml`.
+- Add new tasks under `src/<project_name>/tasks/` with a `run()` function.
+- Data is never tracked in Git — only configuration, scripts, and outputs.
 
 ---
 
 ## Credits
 
 Created by **Jonathan D. Henshaw**
-Generated from [cookiecutter-research-project](https://github.com/jdhenshaw/cookiecutter-research-project)
+
+---
+
+> 📘 The generated project includes its own README with similar content customized to your project’s name and description.
