@@ -1,0 +1,11 @@
+{
+  "project_name": "My Research Project",
+  "project_slug": "my-research-project",
+  "package_name": "{{ cookiecutter.project_slug|lower|replace('-', '_') }}",
+  "description": "Reproducible research project scaffold for data + analysis + pipelines.",
+  "author_name": "Your Name",
+  "author_email": "you@example.com",
+  "license": ["MIT", "BSD-3-Clause", "Apache-2.0", "Proprietary"],
+  "python_version": ["3.11", "3.10", "3.12"],
+  "create_example_notebook": ["no", "yes"]
+}

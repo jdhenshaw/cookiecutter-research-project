@@ -1,0 +1,60 @@
+# ============================================
+# Project configuration file
+# For: Black, Ruff, isort, and Python metadata
+# ============================================
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{ cookiecutter.project_slug }}"
+version = "0.1.0"
+description = "{{ cookiecutter.description }}"
+readme = "README.md"
+requires-python = ">={{ cookiecutter.python_version }}"
+authors = [
+  { name = "{{ cookiecutter.author_name }}", email = "{{ cookiecutter.author_email }}" }
+]
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/your-username/{{ cookiecutter.project_slug }}"
+
+# Use src/ layout
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# --------------------------------------------
+# Black
+# --------------------------------------------
+[tool.black]
+line-length = 99
+target-version = ["py{{ cookiecutter.python_version | replace('.', '') }}"]
+skip-string-normalization = false
+
+# --------------------------------------------
+# Ruff
+# (If you upgrade to Ruff >=0.5, you can move select/ignore under [tool.ruff.lint])
+# --------------------------------------------
+[tool.ruff]
+line-length = 99
+select = ["E", "F", "I"]
+ignore = ["E203", "E266", "E501"]
+exclude = ["__pycache__", "data", ".venv", "env", "notebooks"]
+
+# --------------------------------------------
+# isort
+# --------------------------------------------
+[tool.isort]
+profile = "black"
+line_length = 99
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
