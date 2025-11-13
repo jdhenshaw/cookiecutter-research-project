@@ -34,6 +34,8 @@ my-research-project/
 ├── notebooks/       # Jupyter notebooks
 ├── figures/         # output figures
 ├── tables/          # output tables
+├── presentations/   # project presentations
+├── manuscripts/     # project manuscripts
 ├── env/             # environment setup (requirements, virtualenv)
 └── README.md
 ```

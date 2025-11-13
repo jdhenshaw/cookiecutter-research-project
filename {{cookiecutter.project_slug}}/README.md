@@ -21,6 +21,8 @@ A clean, flexible research project template generated from **cookiecutter-resear
 - `notebooks/` — Jupyter notebooks for exploration or papers
 - `figures/` — Output figures and plots
 - `tables/` — Output tables
+- `presentations/` - Project Presentations
+- `manuscripts/` - Project Manuscripts
 - `env/` — Environment setup (requirements, virtualenv)
 
 ---

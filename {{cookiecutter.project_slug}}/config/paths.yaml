@@ -3,15 +3,17 @@
 # -----------------------------------------
 
 data:
-  core: "data/core"           # primary research data or raw inputs
-  products: "data/products"   # derived, cleaned, or processed data
-  scratch: "data/scratch"     # temporary outputs or caches
+  core: "data/core"            # primary research data or raw inputs
+  products: "data/products"    # derived, cleaned, or processed data
+  scratch: "data/scratch"      # temporary outputs or caches
 
-notebooks: "notebooks"        # Jupyter notebooks
-figures: "figures"            # plots for papers
-tables: "tables"              # tables for papers
-src: "src"                    # analysis and utility code
-pipelines: "pipelines"        # workflow definitions (optional)
+notebooks: "notebooks"         # Jupyter notebooks
+figures: "figures"             # plots for papers
+tables: "tables"               # tables for papers
+src: "src"                     # analysis and utility code
+pipelines: "pipelines"         # workflow definitions (optional)
+presentations: "presentations" # presentations for papers
+manuscripts: "manuscripts"     # manuscripts
 
 # Optional external data sources (edit per project)
 external:

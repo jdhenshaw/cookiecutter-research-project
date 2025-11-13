@@ -1,15 +1,16 @@
 # ============================================
 # Project configuration file
-# For: Black, Ruff, isort, and Python metadata
 # ============================================
 
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=68", "wheel", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "{{ cookiecutter.project_slug }}"
-version = "0.1.0"
+# version now handled dynamically by setuptools-scm
+dynamic = ["version"]
+
 description = "{{ cookiecutter.description }}"
 readme = "README.md"
 requires-python = ">={{ cookiecutter.python_version }}"
@@ -22,34 +23,46 @@ dependencies = []
 [project.urls]
 Homepage = "https://github.com/your-username/{{ cookiecutter.project_slug }}"
 
-# Use src/ layout
+# ============================================
+# setuptools / packaging
+# ============================================
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
-# --------------------------------------------
+# ============================================
+# setuptools-scm (auto version from git tags)
+# ============================================
+[tool.setuptools_scm]
+# Accept tags like v0.1.0 or 0.1.0
+tag_regex = r"^(?:v)?(?P<version>\d+\.\d+\.\d+)$"
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+fallback_version = "0.0.0"
+write_to = "src/{{ cookiecutter.project_slug }}/_version.py"
+
+# ============================================
 # Black
-# --------------------------------------------
+# ============================================
 [tool.black]
 line-length = 99
 target-version = ["py{{ cookiecutter.python_version | replace('.', '') }}"]
 skip-string-normalization = false
 
-# --------------------------------------------
+# ============================================
 # Ruff
-# (If you upgrade to Ruff >=0.5, you can move select/ignore under [tool.ruff.lint])
-# --------------------------------------------
+# ============================================
 [tool.ruff]
 line-length = 99
 select = ["E", "F", "I"]
 ignore = ["E203", "E266", "E501"]
 exclude = ["__pycache__", "data", ".venv", "env", "notebooks"]
 
-# --------------------------------------------
+# ============================================
 # isort
-# --------------------------------------------
+# ============================================
 [tool.isort]
 profile = "black"
 line_length = 99
