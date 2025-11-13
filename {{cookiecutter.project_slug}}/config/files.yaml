@@ -1,0 +1,29 @@
+# ================================================================
+# files.yaml — Template-based filename definitions
+# ================================================================
+# This file defines *how filenames are constructed*.
+#
+# Purpose:
+#   - Provide a single lookup table for all project data products.
+#   - Allow paths to be defined using templates with placeholders.
+#   - A template can use:
+#       • placeholders from params.yaml
+#       • values from a manifest row (if applicable)
+#       • any keys from paths.yaml
+#
+# Rules:
+#   - Use {placeholder} syntax.
+#   - Any new file types can be added freely.
+#   - No Python code changes are required (the system is data-driven).
+# ==============================================================
+
+file_templates:
+  cube:
+    # Example 1 — reference a value from a manifest row, e.g. {"cube": "my_cube.fits"}
+    from_manifest: "{cube}"
+
+    # Example 2 — reference a path from paths.yaml (e.g., data.core: "data/core")
+    in_core_data: "{data.core}/example_cube.fits"
+
+    # Example 3 — reference a placeholder defined in params.yaml
+    using_placeholder: "{project_name}/cube_output.fits"
