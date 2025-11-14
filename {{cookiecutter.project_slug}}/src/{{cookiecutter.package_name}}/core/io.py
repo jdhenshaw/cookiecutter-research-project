@@ -227,7 +227,7 @@ _DEFAULT_TRANSFORMS = {
 }
 
 
-_PLACEHOLDER_RE = re.compile(r"{([A-Za-z0-9_]+)(?:::(\w+))?}")
+_PLACEHOLDER_RE = re.compile(r"{([A-Za-z0-9_.]+)(?:::(\w+))?}")
 
 
 def resolve_template(

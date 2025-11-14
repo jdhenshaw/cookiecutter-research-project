@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Mapping, Optional
 
+from .io import resolve_template
+
 
 def flatten_dict(
     data: Mapping[str, Any],
@@ -10,71 +12,28 @@ def flatten_dict(
 ) -> Dict[str, Any]:
     """Flatten a nested dictionary into a single-level dict.
 
-    Example
-    -------
-    {"external": {"project": {"cubes": "/x"}}}
-    becomes:
-    {"external.project.cubes": "/x"}
-
     Parameters
     ----------
     data : Mapping[str, Any]
-        Nested dictionary.
+        The nested dictionary to flatten.
     parent_key : str, optional
-        Prefix accumulated through recursion.
+        The key to prepend to each flattened key.
     sep : str, optional
-        Separator used to join nested keys.
+        The separator to use between keys.
 
     Returns
     -------
     Dict[str, Any]
-        Flattened mapping.
+        The flattened dictionary.
     """
     flat: Dict[str, Any] = {}
-
     for k, v in data.items():
         new_key = f"{parent_key}{sep}{k}" if parent_key else k
         if isinstance(v, Mapping):
             flat.update(flatten_dict(v, new_key, sep=sep))
         else:
             flat[new_key] = v
-
     return flat
-
-
-def apply_template(template: str, ctx: Mapping[str, Any]) -> str:
-    """Render a template string using context values.
-
-    Notes
-    -----
-    - Supports:
-        {var}
-        {var::upper}
-    - Unknown placeholders remain unchanged.
-
-    Parameters
-    ----------
-    template : str
-        Template string.
-    ctx : Mapping[str, Any]
-        Context mapping.
-
-    Returns
-    -------
-    str
-        Rendered string.
-    """
-    out = str(template)
-
-    # First handle {key::upper}
-    for key, val in ctx.items():
-        out = out.replace(f"{{{key}::upper}}", str(val).upper())
-
-    # Then handle {key}
-    for key, val in ctx.items():
-        out = out.replace(f"{{{key}}}", str(val))
-
-    return out
 
 
 def build_generic_context(
@@ -83,44 +42,44 @@ def build_generic_context(
     row: Optional[Mapping[str, Any]] = None,
     extra: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Build a flat, generic context for template resolution.
+    """Build the flattened template context for file resolution.
 
     Parameters
     ----------
     paths : Mapping[str, Any]
-        The dictionary loaded from paths.yaml.
+        The paths configuration.
     params : Mapping[str, Any]
-        The dictionary loaded from params.yaml.
-    row : Mapping[str, Any], optional
-        Manifest row (e.g. describing a target), exposed as a dict-like object.
-        Can be omitted.
-    extra : Mapping[str, Any], optional
-        Additional overrides.
+        The parameters configuration.
+    row : Optional[Mapping[str, Any]], optional
+        The manifest row.
+    extra : Optional[Mapping[str, Any]], optional
+        Extra context values to inject or override (e.g. "task", "suffix").
 
     Returns
     -------
     Dict[str, Any]
-        A flattened, fully merged context dictionary.
+        The flattened template context.
     """
-
     ctx: Dict[str, Any] = {}
 
-    # 1. Flatten paths.yaml into context
-    flat_paths = flatten_dict(paths)
-    for k, v in flat_paths.items():
-        ctx[k] = v
+    # 1. Flatten paths.yaml
+    ctx.update(flatten_dict(paths))
 
-    # 2. Manifest row adds dynamic keys (e.g. cube, file, base)
-    if row:
-        for k, v in row.items():
+    # 2. Merge manifest row (cube, base, galaxy, array, etc.)
+    if row is not None:
+        try:
+            items = row.items()
+        except AttributeError:
+            items = dict(row).items()
+        for k, v in items:
             ctx[str(k)] = v
 
-    # 3. Apply placeholders from params.yaml
+    # 3. Apply params.placeholders
     placeholder_map = params.get("placeholders", {}) or {}
     for name, expr in placeholder_map.items():
-        ctx[name] = apply_template(str(expr), ctx)
+        ctx[name] = resolve_template(str(expr), ctx)
 
-    # 4. Add any explicit overrides
+    # 4. Apply overrides last
     if extra:
         for k, v in extra.items():
             ctx[str(k)] = v

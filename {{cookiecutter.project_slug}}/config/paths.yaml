@@ -1,7 +1,7 @@
 # ================================================================
 # paths.yaml — Project filesystem configuration
 # ================================================================
-# This file tells the project *where things live* on disk.
+# This file tells the project where things live on disk.
 #
 # Rules:
 # - Keys can be renamed, expanded, or deleted as needed.

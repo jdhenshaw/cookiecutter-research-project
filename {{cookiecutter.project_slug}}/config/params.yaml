@@ -1,7 +1,7 @@
 # ================================================================
 # params.yaml — Generic project parameters
 # ================================================================
-# This file stores *non-path* configuration values:
+# This file stores non-path configuration values:
 # - numeric settings
 # - algorithm parameters
 # - regex rules

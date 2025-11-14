@@ -6,6 +6,7 @@ from .config import (
     get_paths,
 )
 from .context import build_generic_context
+from .files import get_path, resolve_file
 
 __all__ = [
     "get_configs",
@@ -14,4 +15,6 @@ __all__ = [
     "get_files",
     "ensure_project_directories",
     "build_generic_context",
+    "resolve_file",
+    "get_path",
 ]
