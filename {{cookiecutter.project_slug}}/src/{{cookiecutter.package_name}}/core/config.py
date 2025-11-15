@@ -1,5 +1,12 @@
+"""Configuration loading and caching.
+
+This module provides functions for loading and caching project configuration
+files (paths.yaml, params.yaml, files.yaml) with LRU caching for performance.
+"""
+
 from __future__ import annotations
 
+import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Mapping, Tuple, Union
@@ -11,6 +18,8 @@ from .io import (
     load_config as _core_load_config,
 )
 
+logger = logging.getLogger(__name__)
+
 
 @lru_cache(maxsize=1)
 def get_configs(
@@ -21,7 +30,7 @@ def get_configs(
     Notes
     -----
     This is a thin wrapper around ``core.io.load_config`` that adds
-    caching. The first call reads:
+    caching. The first call reads
 
     - ``paths.yaml``  → directory layout (as Path objects)
     - ``params.yaml`` → project parameters
@@ -39,7 +48,16 @@ def get_configs(
     Tuple[Mapping[str, Any], Mapping[str, Any], Mapping[str, Any]]
         ``(paths, params, files)`` dictionaries.
     """
-    return _core_load_config(config_dir=config_dir)
+    logger.info("Loading configs from %s", config_dir)
+    # Cache ensures this only runs once
+    paths, params, files = _core_load_config(config_dir=config_dir)
+    logger.debug(
+        "Loaded configs: paths (%d keys), params (%d keys), files (%d keys)",
+        len(paths),
+        len(params),
+        len(files),
+    )
+    return paths, params, files
 
 
 def get_paths(config_dir: Union[str, Path] = "config") -> Mapping[str, Any]:
@@ -108,3 +126,15 @@ def ensure_project_directories(config_dir: Union[str, Path] = "config") -> None:
     """
     paths = get_paths(config_dir=config_dir)
     _core_ensure_directories(paths)
+
+
+def clear_config_cache() -> None:
+    """Clear the configuration cache.
+
+    Examples
+    --------
+    >>> clear_config_cache()
+    >>> paths, params, files = get_configs()  # Will reload from disk
+    """
+    get_configs.cache_clear()
+    logger.debug("Configuration cache cleared")

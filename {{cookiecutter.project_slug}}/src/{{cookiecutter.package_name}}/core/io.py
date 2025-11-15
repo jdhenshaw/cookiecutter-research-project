@@ -1,3 +1,9 @@
+"""Input/output operations and template resolution.
+
+This module handles YAML configuration loading, path manipulation, and
+template string resolution with placeholder substitution.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -7,6 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, Mapping, Tuple, Union
 
 import yaml
+
+from .utils import fuzzy_match_key
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +40,11 @@ def project_root(start: Union[str, Path] = ".") -> Path:
         The project root directory.
     """
     p = Path(start).resolve()
+    # Walk up directory tree looking for project root markers
     for parent in [p, *p.parents]:
         if (parent / "config").is_dir() or (parent / ".git").exists():
             return parent
+    # Fallback to starting directory
     return p
 
 
@@ -99,7 +109,9 @@ def _coerce_paths(obj: Any, base: Path) -> Any:
     if isinstance(obj, list):
         return [_coerce_paths(v, base) for v in obj]
     if isinstance(obj, str):
+        # Expand ~ and $VARS
         p = _expand(obj)
+        # Relative path, resolve from base
         if not Path(obj).is_absolute() and not str(obj).startswith((".", "..")):
             p = base / obj
         return Path(p)
@@ -133,6 +145,7 @@ def load_config(
     """
     root = project_root()
     cfg_dir = (root / config_dir).resolve()
+    logger.debug("Loading configs from %s (project root: %s)", cfg_dir, root)
 
     paths_file = cfg_dir / "paths.yaml"
     params_file = cfg_dir / "params.yaml"
@@ -142,7 +155,14 @@ def load_config(
     params = _load_yaml(params_file)
     files = _load_yaml(files_file)
 
+    # Convert string paths to Path objects
     paths = _coerce_paths(raw_paths, base=root)
+    logger.debug(
+        "Loaded configs: paths (%d top-level keys), params (%d top-level keys), files (%d top-level keys)",
+        len(raw_paths),
+        len(params),
+        len(files),
+    )
 
     return paths, params, files
 
@@ -169,8 +189,10 @@ def ensure_directories(paths_dict: Mapping[str, Any]) -> list[Path]:
 
     def _walk(v: Any) -> None:
         if isinstance(v, Path):
+            # Use parent dir if Path points to file
             target = v.parent if v.suffix else v
             if not target.exists():
+                # Create directory tree
                 target.mkdir(parents=True, exist_ok=True)
                 created.append(target)
         elif isinstance(v, dict):
@@ -234,6 +256,8 @@ def resolve_template(
     template: str,
     context: Mapping[str, Any],
     extra_transforms: Mapping[str, Any] | None = None,
+    strict: bool = False,
+    suppress_warnings: bool = False,
 ) -> str:
     """Resolve a single template string using the provided context.
 
@@ -242,7 +266,7 @@ def resolve_template(
     - Placeholders use `{key}` syntax.
     - Simple inline transforms are supported via `{key::upper}`, `{key::lower}`,
       `{key::title}`, `{key::strip}`.
-    - Unknown keys are left untouched in the output.
+    - Unknown keys are left untouched in the output (unless strict=True).
     - Unknown transform names are ignored (the raw value is used).
 
     Parameters
@@ -254,6 +278,13 @@ def resolve_template(
     extra_transforms : Mapping[str, Any], optional
         Mapping of transform name -> callable(str) -> str, which will be merged
         with the default transforms.
+    strict : bool, optional
+        If True, raise KeyError for unknown placeholders. Defaults to False.
+
+    Raises
+    ------
+    KeyError
+        If strict=True and a placeholder references an unknown key.
 
     Returns
     -------
@@ -267,12 +298,39 @@ def resolve_template(
     if extra_transforms:
         transforms.update(extra_transforms)
 
+    context_keys = list(context.keys())
+    unresolved_placeholders: list[str] = []
+
     def _repl(match: re.Match) -> str:
+        """Replace a single placeholder in the template string.
+
+        Parameters
+        ----------
+        match : re.Match
+            The match object from the regular expression.
+
+        Returns
+        -------
+        str
+            The replaced string.
+        """
         key = match.group(1)
         tname = match.group(2)
+        placeholder = match.group(0)
 
         if key not in context:
-            # Leave unknown placeholders unchanged
+            if strict:
+                # Suggest similar keys for typos
+                similar = fuzzy_match_key(key, context_keys)
+                error_msg = (
+                    f"Placeholder '{placeholder}' references unknown key '{key}'. "
+                    f"Available context keys: {sorted(context_keys)}"
+                )
+                if similar:
+                    error_msg += f" Did you mean: {similar}?"
+                raise KeyError(error_msg)
+            unresolved_placeholders.append(placeholder)
+            # Leave placeholder unchanged if not in context
             return match.group(0)
 
         value = str(context[key])
@@ -281,16 +339,53 @@ def resolve_template(
             if callable(func):
                 try:
                     value = func(value)
-                except Exception as exc:  # pragma: no cover - defensive
+                except Exception as exc:
                     logger.warning(
-                        "Error applying transform '%s' to key '%s': %s",
+                        "Error applying transform '%s' to key '%s': %s. "
+                        "Using untransformed value.",
                         tname,
                         key,
                         exc,
                     )
+            else:
+                logger.warning(
+                    "Unknown transform '%s' for key '%s'. Available transforms: %s. "
+                    "Using untransformed value.",
+                    tname,
+                    key,
+                    list(transforms.keys()),
+                )
         return value
 
-    return _PLACEHOLDER_RE.sub(_repl, str(template))
+    logger.debug("Resolving template: %s", template)
+    # Replace all {placeholder} matches
+    result = _PLACEHOLDER_RE.sub(_repl, str(template))
+    logger.debug("Resolved template result: %s", result)
+
+    if unresolved_placeholders and not strict:
+        # Check if any placeholders remain in output
+        remaining_unresolved = _PLACEHOLDER_RE.findall(result)
+        if remaining_unresolved and not suppress_warnings:
+            unresolved_keys = {match[0] for match in remaining_unresolved}
+            logger.warning(
+                "Template contains unresolved placeholders: %s. Available context keys: %s",
+                unresolved_keys,
+                sorted(context_keys),
+            )
+        elif remaining_unresolved and suppress_warnings:
+            unresolved_keys = {match[0] for match in remaining_unresolved}
+            logger.debug(
+                "Template contains unresolved placeholders (suppressed): %s. Available context keys: %s",
+                unresolved_keys,
+                sorted(context_keys),
+            )
+        else:
+            logger.debug(
+                "Some placeholders were initially unresolved but may be resolved later: %s",
+                set(unresolved_placeholders),
+            )
+
+    return result
 
 
 def resolve_block(
@@ -345,15 +440,15 @@ def get_by_dotted(mapping: Mapping[str, Any], dotted: str) -> Any:
     dotted : str
         Dotted path, e.g. ``"file_templates.moment0.strict"``.
 
-    Returns
-    -------
-    Any
-        The retrieved value.
-
     Raises
     ------
     KeyError
         If any part of the dotted path is missing.
+
+    Returns
+    -------
+    Any
+        The retrieved value.
     """
     current: Any = mapping
     for part in dotted.split("."):

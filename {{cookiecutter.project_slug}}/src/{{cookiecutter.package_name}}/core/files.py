@@ -1,10 +1,20 @@
+"""File path resolution and template management.
+
+This module provides functions for resolving file paths from configuration
+templates, including support for nested key lookups and fuzzy matching.
+"""
+
 from __future__ import annotations
 
+import logging
 from typing import Any, Mapping, Optional
 
 from .config import get_files, get_params, get_paths
 from .context import build_generic_context
 from .io import resolve_template
+from .utils import fuzzy_match_key
+
+logger = logging.getLogger(__name__)
 
 
 def deep_get(mapping: Mapping[str, Any], dotted_key: str) -> Any:
@@ -34,9 +44,23 @@ def deep_get(mapping: Mapping[str, Any], dotted_key: str) -> Any:
     """
     parts = dotted_key.split(".")
     current: Any = mapping
-    for part in parts:
+    for i, part in enumerate(parts):
         if not isinstance(current, Mapping) or part not in current:
-            raise KeyError(f"Key path '{dotted_key}' not found (stopped at '{part}').")
+            # Build context for error message
+            available_keys = (
+                list(current.keys()) if isinstance(current, Mapping) else []
+            )
+            similar = fuzzy_match_key(part, available_keys) if available_keys else []
+
+            path_so_far = ".".join(parts[:i])
+            error_msg = f"Key path '{dotted_key}' not found (stopped at '{part}')."
+            if path_so_far:
+                error_msg += f" Path so far: '{path_so_far}'"
+            if available_keys:
+                error_msg += f" Available keys at this level: {sorted(available_keys)}"
+            if similar:
+                error_msg += f" Did you mean: {similar}?"
+            raise KeyError(error_msg)
         current = current[part]
     return current
 
@@ -85,22 +109,54 @@ def resolve_file(
     str
         The resolved filename/path.
     """
-    # If the key is already rooted at the top level (e.g. "outputs.*"),
-    # respect it. Otherwise, interpret as relative to "file_templates".
     first = key.split(".", 1)[0]
+    # Determine if key is absolute or relative to file_templates
     if first in files_cfg:
+        # Absolute key
         dotted = key
     else:
+        # Relative key
         dotted = f"file_templates.{key}"
 
-    template = deep_get(files_cfg, dotted)
+    try:
+        # Navigate nested dict structure
+        template = deep_get(files_cfg, dotted)
+    except KeyError as e:
+        top_level_keys = list(files_cfg.keys())
+        if "file_templates" in files_cfg:
+            file_template_keys = (
+                list(files_cfg["file_templates"].keys())
+                if isinstance(files_cfg["file_templates"], dict)
+                else []
+            )
+        else:
+            file_template_keys = []
+
+        error_msg = f"Template key '{key}' not found. "
+        if first in top_level_keys:
+            error_msg += f"Available keys in '{first}': {sorted(file_template_keys) if first == 'file_templates' else 'N/A'}"
+        else:
+            error_msg += f"Top-level keys: {sorted(top_level_keys)}"
+            if file_template_keys:
+                similar = fuzzy_match_key(key, file_template_keys)
+                if similar:
+                    error_msg += f" Did you mean: {similar}?"
+        raise KeyError(error_msg) from e
 
     if not isinstance(template, str):
         raise TypeError(
             f"Template at '{dotted}' is not a string (got {type(template)!r})."
         )
 
-    return resolve_template(template, context)
+    try:
+        # Substitute placeholders with context values
+        return resolve_template(template, context)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to resolve template '{dotted}': {e}. "
+            f"Template: {template!r}. "
+            f"Available context keys: {sorted(context.keys())}"
+        ) from e
 
 
 def get_path(
@@ -123,15 +179,39 @@ def get_path(
     **extra : Any
         Extra context values to inject or override (e.g. task="demo", suffix="test").
 
+    Raises
+    ------
+    KeyError
+        If the template key is not found.
+    RuntimeError
+        If template resolution fails.
+
     Returns
     -------
     str
         The resolved filesystem path.
     """
-    paths = get_paths()
-    params = get_params()
-    files = get_files()
+    try:
+        logger.debug("Resolving path for key '%s'", key)
+        paths = get_paths()
+        params = get_params()
+        files = get_files()
 
-    ctx = build_generic_context(paths=paths, params=params, row=row, extra=extra)
+        # Merge all context sources (paths, params, row, extra)
+        ctx = build_generic_context(paths=paths, params=params, row=row, extra=extra)
+        logger.debug(
+            "Context built with %d keys: %s", len(ctx), sorted(ctx.keys())[:10]
+        )
 
-    return resolve_file(files_cfg=files, key=key, context=ctx)
+        # Resolve template to final path
+        result = resolve_file(files_cfg=files, key=key, context=ctx)
+        logger.debug("Resolved path: %s", result)
+        return result
+    except (KeyError, RuntimeError):
+        raise
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to resolve path for key '{key}': {e}. "
+            f"Row: {dict(row) if row else 'None'}. "
+            f"Extra context: {extra if extra else 'None'}"
+        ) from e

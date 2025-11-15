@@ -1,3 +1,9 @@
+"""Manifest file scanning and management.
+
+This module provides functions for scanning directories, parsing filenames,
+building manifest tables, and reading/writing ECSV manifest files.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -114,11 +120,15 @@ def build_manifest_rows(
     """
     rows = []
     for p in files:
+        # Filename without extension
         base = p.stem
+        # Always include path and base
         entry = {"path": str(p), "base": base}
+        # Add parsed fields (e.g., galaxy, array)
         entry.update(parser(base))
         rows.append(entry)
 
+    # Apply domain-specific filters
     return apply_filters(rows, filters)
 
 

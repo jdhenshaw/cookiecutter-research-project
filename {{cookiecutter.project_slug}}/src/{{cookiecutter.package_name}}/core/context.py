@@ -1,3 +1,10 @@
+"""Template context building and management.
+
+This module provides functions for building flattened context dictionaries
+from configuration files, manifest rows, and extra parameters for use
+in template resolution.
+"""
+
 from __future__ import annotations
 
 from typing import Any, Dict, Mapping, Optional
@@ -63,25 +70,40 @@ def build_generic_context(
     ctx: Dict[str, Any] = {}
 
     # 1. Flatten paths.yaml
+    # Converts nested paths to dotted keys (e.g., data.core)
     ctx.update(flatten_dict(paths))
 
     # 2. Merge manifest row (cube, base, galaxy, array, etc.)
     if row is not None:
+        # Try dict-like interface first
         try:
             items = row.items()
-        except AttributeError:
-            items = dict(row).items()
+        except (AttributeError, TypeError):
+            # Convert Astropy Row to dict
+            try:
+                row_dict = dict(row)
+                items = row_dict.items()
+            except (TypeError, ValueError):
+                # Fallback to attributes
+                items = [
+                    (k, getattr(row, k)) for k in dir(row) if not k.startswith("_")
+                ]
+
         for k, v in items:
-            ctx[str(k)] = v
+            if not callable(v):
+                # Add row data to context (overrides flattened paths if same key)
+                ctx[str(k)] = v
 
     # 3. Apply params.placeholders
     placeholder_map = params.get("placeholders", {}) or {}
     for name, expr in placeholder_map.items():
-        ctx[name] = resolve_template(str(expr), ctx)
+        # Resolve placeholders using current context
+        ctx[name] = resolve_template(str(expr), ctx, suppress_warnings=True)
 
     # 4. Apply overrides last
     if extra:
         for k, v in extra.items():
+            # Extra context has highest precedence
             ctx[str(k)] = v
 
     return ctx
