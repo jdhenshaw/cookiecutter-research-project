@@ -17,4 +17,4 @@ ipykernel
 # Configuration / utilities
 pyyaml
 tqdm
-dotenv
+python-dotenv
