@@ -1,0 +1,44 @@
+# ================================================================
+# files.yaml — Template-based filename definitions
+# ================================================================
+# This file defines how filenames are constructed and used in the
+# project.
+#
+# Purpose
+# -------
+# - Provide a single lookup table for all project data products.
+# - Allow paths to be defined using templates with placeholders.
+# - Keep Python code generic so that you only edit YAML when
+#   conventions change.
+#
+# What can appear in {}?
+# ----------------------------------
+# 1. Any key from paths.yaml, using dots:
+#      {data.core}, {external.phangs.cubes}, {figures}, {tables}, ...
+# 2. Any key from params.yaml (e.g. defaults, placeholders):
+#      {line}, {galname}, {arraytag}, {galaxy_id}, ...
+# 3. Any field from a manifest row (if you pass one):
+#      {cube}, {base}, {galaxy}, {array}, ...
+#
+# Usage (conceptually)
+# --------------------
+# - "file_templates" entries are variable names you can ask for, e.g.:
+#     get_file("mom0", context=...)
+#     get_file_for_row(files, "cube_from_index", row=row, paths=paths,
+#                      params=params, files_config=files)
+#
+# Rules
+# -----
+# - Keep keys flat: mom0, mom1, scouse_rms, alpha_co, ...
+# - Use {placeholder} syntax.
+# ================================================================
+
+file_templates:
+  # Example 1 — reference a value from a manifest row, e.g. {"cube": "my_cube.fits"}
+  cube_from_manifest: "{cube}"
+
+  # Example 2 — reference a path from paths.yaml (e.g., data.core: "data/core")
+  cube_in_core_data: "{data.core}/example_cube.fits"
+
+  # Example 3 — reference a placeholder defined in params.yaml
+  cube_using_placeholder: "{project_name}/cube_output.fits"

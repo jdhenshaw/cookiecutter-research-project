@@ -16,7 +16,7 @@ A clean, flexible research project template generated from **cookiecutter-resear
 - `src/` — Source code for reusable modules:
   - `core/` — I/O and configuration utilities
   - `tasks/` — Reproducible analysis tasks
-  - `plotting/` — Figure and visualization scripts
+  - `vis/` — Figure and visualization scripts
 - `pipelines/` — Optional workflow definitions (Snakemake, YAML, etc.)
 - `notebooks/` — Jupyter notebooks for exploration or papers
 - `figures/` — Output figures and plots

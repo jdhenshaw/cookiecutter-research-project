@@ -1,6 +1,18 @@
-# -----------------------------------------
-# Project directory structure
-# -----------------------------------------
+# ================================================================
+# paths.yaml — Project filesystem configuration
+# ================================================================
+# This file tells the project where things live on disk.
+#
+# Rules:
+# - Keys can be renamed, expanded, or deleted as needed.
+# - Values may be relative (to project root) or absolute paths.
+# - "~" and environment variables ("$HOME") are allowed.
+# - Directories listed here will be auto-created.
+# - Nothing in this file should depend on domain-specific logic.
+#
+# Add any groups of paths you like (e.g., "data", "results", "external").
+# These become available automatically in the context used by templates.
+# ==============================================================
 
 data:
   core: "data/core"            # primary research data or raw inputs
