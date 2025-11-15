@@ -18,7 +18,7 @@ dist/
 .env/
 .envrc
 pip-wheel-metadata/
-.env
+.env_template
 
 # -----------------------------------------
 # Jupyter / Notebooks
@@ -37,7 +37,7 @@ data/scratch/
 # -----------------------------------------
 # LLM Tools
 # -----------------------------------------
-src/core/llm.py
+src/{{cookiecutter.package_name}}/core/llm.py
 src/{{cookiecutter.package_name}}/llm_tools/
 
 # -----------------------------------------
