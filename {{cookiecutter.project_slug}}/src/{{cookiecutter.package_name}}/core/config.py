@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 def get_configs(
     config_dir: Union[str, Path] = "config",
 ) -> Tuple[Mapping[str, Any], Mapping[str, Any], Mapping[str, Any]]:
-    """Load and cache the PHANGS-ScousePy configuration.
+    """Load and cache the configuration.
 
     Notes
     -----
