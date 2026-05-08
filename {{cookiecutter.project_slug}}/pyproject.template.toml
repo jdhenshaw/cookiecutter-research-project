@@ -37,11 +37,11 @@ where = ["src"]
 # ============================================
 [tool.setuptools_scm]
 # Accept tags like v0.1.0 or 0.1.0
-tag_regex = r"^(?:v)?(?P<version>\d+\.\d+\.\d+)$"
+tag_regex = "^(?:v)?(?P<version>\\d+\\.\\d+\\.\\d+)$"
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
 fallback_version = "0.0.0"
-write_to = "src/{{ cookiecutter.project_slug }}/_version.py"
+write_to = "src/{{ cookiecutter.package_name }}/_version.py"
 
 # ============================================
 # Black

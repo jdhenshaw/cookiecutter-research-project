@@ -18,6 +18,7 @@ dist/
 .env/
 .envrc
 pip-wheel-metadata/
+.env_template
 
 # -----------------------------------------
 # Jupyter / Notebooks
@@ -29,9 +30,18 @@ pip-wheel-metadata/
 # -----------------------------------------
 # Data (local only, don't sync large files)
 # -----------------------------------------
-data/core/
-data/products/
-data/scratch/
+data/core/*
+data/products/*
+data/scratch/*
+!data/core/.gitkeep
+!data/products/.gitkeep
+!data/scratch/.gitkeep
+
+# -----------------------------------------
+# LLM Tools
+# -----------------------------------------
+src/{{cookiecutter.package_name}}/core/llm.py
+src/{{cookiecutter.package_name}}/llm_tools/
 
 # -----------------------------------------
 # OS / Editors
