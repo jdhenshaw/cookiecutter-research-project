@@ -30,9 +30,12 @@ pip-wheel-metadata/
 # -----------------------------------------
 # Data (local only, don't sync large files)
 # -----------------------------------------
-data/core/
-data/products/
-data/scratch/
+data/core/*
+data/products/*
+data/scratch/*
+!data/core/.gitkeep
+!data/products/.gitkeep
+!data/scratch/.gitkeep
 
 # -----------------------------------------
 # LLM Tools
