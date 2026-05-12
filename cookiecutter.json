@@ -6,6 +6,5 @@
   "author_name": "Your Name",
   "author_email": "you@example.com",
   "license": ["MIT", "BSD-3-Clause", "Apache-2.0", "Proprietary"],
-  "python_version": ["3.11", "3.10", "3.12"],
-  "create_example_notebook": ["no", "yes"]
+  "python_version": ["3.11", "3.10", "3.12"]
 }
