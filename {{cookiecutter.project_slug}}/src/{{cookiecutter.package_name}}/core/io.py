@@ -413,13 +413,10 @@ def resolve_block(
         return resolve_template(obj, context, extra_transforms=extra_transforms)
     if isinstance(obj, dict):
         return {
-            k: resolve_block(v, context, extra_transforms=extra_transforms)
-            for k, v in obj.items()
+            k: resolve_block(v, context, extra_transforms=extra_transforms) for k, v in obj.items()
         }
     if isinstance(obj, list):
-        return [
-            resolve_block(v, context, extra_transforms=extra_transforms) for v in obj
-        ]
+        return [resolve_block(v, context, extra_transforms=extra_transforms) for v in obj]
     return obj
 
 

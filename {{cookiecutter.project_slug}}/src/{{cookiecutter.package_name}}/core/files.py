@@ -47,9 +47,7 @@ def deep_get(mapping: Mapping[str, Any], dotted_key: str) -> Any:
     for i, part in enumerate(parts):
         if not isinstance(current, Mapping) or part not in current:
             # Build context for error message
-            available_keys = (
-                list(current.keys()) if isinstance(current, Mapping) else []
-            )
+            available_keys = list(current.keys()) if isinstance(current, Mapping) else []
             similar = fuzzy_match_key(part, available_keys) if available_keys else []
 
             path_so_far = ".".join(parts[:i])
@@ -144,9 +142,7 @@ def resolve_file(
         raise KeyError(error_msg) from e
 
     if not isinstance(template, str):
-        raise TypeError(
-            f"Template at '{dotted}' is not a string (got {type(template)!r})."
-        )
+        raise TypeError(f"Template at '{dotted}' is not a string (got {type(template)!r}).")
 
     try:
         # Substitute placeholders with context values
@@ -199,9 +195,7 @@ def get_path(
 
         # Merge all context sources (paths, params, row, extra)
         ctx = build_generic_context(paths=paths, params=params, row=row, extra=extra)
-        logger.debug(
-            "Context built with %d keys: %s", len(ctx), sorted(ctx.keys())[:10]
-        )
+        logger.debug("Context built with %d keys: %s", len(ctx), sorted(ctx.keys())[:10])
 
         # Resolve template to final path
         result = resolve_file(files_cfg=files, key=key, context=ctx)

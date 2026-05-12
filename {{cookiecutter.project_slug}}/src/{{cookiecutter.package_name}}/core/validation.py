@@ -94,9 +94,7 @@ def validate_paths(paths: Mapping[str, Any], check_external: bool = True) -> Lis
             if is_external and check_external:
                 if not value.exists():
                     # Warn only, don't error
-                    warnings.append(
-                        f"External path does not exist: {key_path} = {value}"
-                    )
+                    warnings.append(f"External path does not exist: {key_path} = {value}")
             elif not is_external:
                 # Use parent dir if Path is a file
                 parent = value.parent if value.suffix else value

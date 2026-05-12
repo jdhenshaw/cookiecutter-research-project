@@ -85,9 +85,7 @@ def debug_template(
             else:
                 logger.debug(f"Resolving {placeholder}: {placeholder_key} = '{value}'")
         else:
-            logger.warning(
-                f"Placeholder {placeholder} references unknown key '{placeholder_key}'"
-            )
+            logger.warning(f"Placeholder {placeholder} references unknown key '{placeholder_key}'")
 
     result = resolve_template(template, ctx)
     logger.info(f"Resolved path: {result}")

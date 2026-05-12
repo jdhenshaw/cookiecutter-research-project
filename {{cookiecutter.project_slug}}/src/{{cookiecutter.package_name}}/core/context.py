@@ -85,9 +85,7 @@ def build_generic_context(
                 items = row_dict.items()
             except (TypeError, ValueError):
                 # Fallback to attributes
-                items = [
-                    (k, getattr(row, k)) for k in dir(row) if not k.startswith("_")
-                ]
+                items = [(k, getattr(row, k)) for k in dir(row) if not k.startswith("_")]
 
         for k, v in items:
             if not callable(v):

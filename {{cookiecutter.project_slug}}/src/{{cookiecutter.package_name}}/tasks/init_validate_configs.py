@@ -18,9 +18,7 @@ def run(check_paths: bool = True, check_templates: bool = True) -> None:
     SystemExit
         If validation fails.
     """
-    is_valid, errors = validate_configs(
-        check_paths=check_paths, check_templates=check_templates
-    )
+    is_valid, errors = validate_configs(check_paths=check_paths, check_templates=check_templates)
 
     if is_valid:
         print("Config validation passed")
