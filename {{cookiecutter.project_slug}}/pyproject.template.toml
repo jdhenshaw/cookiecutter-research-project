@@ -47,30 +47,16 @@ fallback_version = "0.0.0"
 write_to = "src/{{ cookiecutter.package_name }}/_version.py"
 
 # ============================================
-# Black
-# ============================================
-[tool.black]
-line-length = 99
-target-version = ["py{{ cookiecutter.python_version | replace('.', '') }}"]
-skip-string-normalization = false
-
-# ============================================
-# Ruff
+# Ruff (lint + format + import sorting)
 # ============================================
 [tool.ruff]
 line-length = 99
-select = ["E", "F", "I"]
-ignore = ["E203", "E266", "E501"]
+target-version = "py{{ cookiecutter.python_version | replace('.', '') }}"
 exclude = ["__pycache__", "data", ".venv", "env", "notebooks"]
 
-# ============================================
-# isort
-# ============================================
-[tool.isort]
-profile = "black"
-line_length = 99
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E203", "E266", "E501"]
+
+[tool.ruff.format]
+# Defaults are fine: 4-space indent, double quotes, line endings auto.
