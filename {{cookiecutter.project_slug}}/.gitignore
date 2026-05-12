@@ -45,8 +45,6 @@ Thumbs.db
 *.swo
 .idea/
 __MACOSX/
-.vscode/*
-!.vscode/settings.json
 
 # -----------------------------------------
 # Logs / Temp / Caches
