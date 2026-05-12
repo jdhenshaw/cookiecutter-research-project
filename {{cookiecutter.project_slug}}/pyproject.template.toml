@@ -74,3 +74,10 @@ ignore = ["E203", "E266", "E501"]
 
 [tool.ruff.format]
 # Defaults are fine: 4-space indent, double quotes, line endings auto.
+
+# ============================================
+# pytest
+# ============================================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
