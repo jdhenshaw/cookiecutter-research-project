@@ -1,4 +1,3 @@
-# pyright: reportMissingImports=false, reportUndefinedVariable=false
 """Smoke tests for a freshly generated project."""
 
 from {{cookiecutter.package_name}}.core import validate_configs
