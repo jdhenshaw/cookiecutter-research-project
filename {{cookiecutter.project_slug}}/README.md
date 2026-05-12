@@ -23,7 +23,6 @@ A clean, flexible research project template generated from **cookiecutter-resear
 - `tables/` — Output tables
 - `presentations/` - Project Presentations
 - `manuscripts/` - Project Manuscripts
-- `env/` — Environment setup (requirements, virtualenv)
 
 ---
 
@@ -34,9 +33,8 @@ A clean, flexible research project template generated from **cookiecutter-resear
 python -m venv .venv
 source .venv/bin/activate
 
-# install dependencies
-pip install -r env/requirements.txt
-pip install -e .
+# install the project (with dev tooling and notebook support)
+pip install -e ".[dev,notebook]"
 ```
 
 ---
@@ -46,7 +44,7 @@ pip install -e .
 You can run a registered task immediately:
 
 ```bash
-python -c "from {{ cookiecutter.package_name }}.tasks import run_task; print(run_task('template'))"
+{{ cookiecutter.project_slug }} run template
 ```
 
 This writes a small artifact to `data/products/example_artifact.txt`.

@@ -18,7 +18,21 @@ authors = [
   { name = "{{ cookiecutter.author_name }}", email = "{{ cookiecutter.author_email }}" }
 ]
 license = { file = "LICENSE" }
-dependencies = []
+dependencies = [
+  "numpy",
+  "scipy",
+  "pandas",
+  "matplotlib",
+  "astropy",
+  "spectral-cube",
+  "pyyaml",
+  "tqdm",
+  "typer",
+]
+
+[project.optional-dependencies]
+dev = ["ruff", "pytest"]
+notebook = ["notebook", "ipykernel"]
 
 [project.urls]
 Homepage = "https://github.com/your-username/{{ cookiecutter.project_slug }}"

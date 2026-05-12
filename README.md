@@ -36,7 +36,6 @@ my-research-project/
 ├── tables/          # output tables
 ├── presentations/   # project presentations
 ├── manuscripts/     # project manuscripts
-├── env/             # environment setup (requirements, virtualenv)
 └── README.md
 ```
 
@@ -58,9 +57,8 @@ Then follow the prompts to name your new project and set up your environment.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r env/requirements.txt
-pip install -e .
-python -c "from my_research_project.tasks import run_task; print(run_task('template'))"
+pip install -e ".[dev,notebook]"
+my-research-project run template
 ```
 
 ---
