@@ -23,6 +23,9 @@ dependencies = []
 [project.urls]
 Homepage = "https://github.com/your-username/{{ cookiecutter.project_slug }}"
 
+[project.scripts]
+{{ cookiecutter.project_slug }} = "{{ cookiecutter.package_name }}.cli:app"
+
 # ============================================
 # setuptools / packaging
 # ============================================
