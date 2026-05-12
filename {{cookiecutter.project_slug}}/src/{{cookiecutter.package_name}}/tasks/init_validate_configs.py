@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from phangs_scouse.core import validate_configs
+from {{cookiecutter.package_name}}.core import validate_configs
 
 
 def run(check_paths: bool = True, check_templates: bool = True) -> None:

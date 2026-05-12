@@ -1,4 +1,4 @@
-"""Utility functions for the phangs_scouse core module.
+"""Utility functions for the {{cookiecutter.package_name}} core module.
 
 This module provides shared utility functions used across the core package,
 including string matching algorithms and resource management helpers.

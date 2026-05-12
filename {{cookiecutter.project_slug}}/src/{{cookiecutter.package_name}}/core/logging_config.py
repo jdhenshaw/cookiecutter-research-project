@@ -1,6 +1,6 @@
 """Logging configuration and setup.
 
-This module provides functions for configuring logging for the phangs_scouse
+This module provides functions for configuring logging for the {{cookiecutter.package_name}}
 package, including console and file handlers with customizable formats.
 """
 
@@ -16,7 +16,7 @@ def setup_logging(
     format_string: str | None = None,
     log_file: Path | str | None = None,
 ) -> None:
-    """Configure logging for phangs_scouse.
+    """Configure logging for {{cookiecutter.package_name}}.
 
     Parameters
     ----------
@@ -33,7 +33,7 @@ def setup_logging(
     if isinstance(level, str):
         level = getattr(logging, level.upper(), logging.INFO)
 
-    logger = logging.getLogger("phangs_scouse")
+    logger = logging.getLogger("{{cookiecutter.package_name}}")
     logger.setLevel(level)
 
     logger.handlers.clear()
@@ -69,4 +69,4 @@ def get_logger(name: str) -> logging.Logger:
     logging.Logger
         The logger instance.
     """
-    return logging.getLogger(f"phangs_scouse.{name}")
+    return logging.getLogger(f"{{cookiecutter.package_name}}.{name}")
