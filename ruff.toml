@@ -1,1 +1,1 @@
-extend-exclude = ["{{cookiecutter.project_slug}}"]
+extend-exclude = ["**/*cookiecutter*/**"]

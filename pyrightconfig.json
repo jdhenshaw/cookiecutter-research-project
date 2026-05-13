@@ -1,7 +1,10 @@
 {
   "exclude": [
-    "{{cookiecutter.project_slug}}",
+    "**/*cookiecutter*/**",
     "**/__pycache__",
     "**/.venv"
+  ],
+  "ignore": [
+    "**/*cookiecutter*/**"
   ]
 }
